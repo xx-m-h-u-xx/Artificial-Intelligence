@@ -1,0 +1,34 @@
+%%=========================================================================================
+%% Performance Evaluation Cross Validation
+%%=========================================================================================
+
+
+% 1.
+
+cv_m_knn = fitcknn(train_examples, train_labels, 'NumNeighbors', 15, 'Standardize', true, 'KFold', 10);
+
+
+cv_m_nb = fitcnb(train_examples, train_labels, 'KFold', 10);
+
+% 2.
+
+loss_knn = kfoldLoss(cv_m_knn)
+
+
+loss_nb = kfoldLoss(cv_m_nb)
+
+
+% 3.
+
+m = fitcknn(train_examples, train_labels, 'NumNeighbors', 15, 'Standardize', true);
+
+% 4.
+
+predictions = predict(m, test_examples);
+
+% 5.
+
+[c,order] = confusionmat(test_labels, predictions)
+
+
+p = sum(diag(c)) / sum(c(1:1:end))
