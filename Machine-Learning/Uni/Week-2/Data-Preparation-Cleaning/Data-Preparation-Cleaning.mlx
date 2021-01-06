@@ -1,0 +1,63 @@
+%%==============================================================================================================================================
+%% Data Preparation: Cleaning
+%% This code predicts the "diagnosis" feature from a CSV file. Cleans and separates the raw data - ready for training and testing a classifier.
+%%==============================================================================================================================================
+
+clear all;
+data = readtable('biopsies_raw.csv');
+
+
+% 1.
+
+% "data" gets its table description summarised onto the command prompt/terminal
+summary(data);
+
+%% Extracting & removing irrelevant features; missing values; duplicated examples
+% a matrix "data" containing the unique rows and same order as in the original data.
+data = unique(data, 'rows', 'stable');
+
+% deletes all the rows of data that's under the "id" column
+data(:,'id') = [];
+
+%% Removes extreme outlier for the "smoothness_mean" feature
+% find returns a vector containing the linear indices of each nonzero
+% elements in all the rows in "data" under the "radius_mean" feature column
+% isnan returns a logical array containing 1 (true) where the elements of A are NaN, and 0 (false) where they are not. 
+bad = find(isnan(data{:,'radius_mean'}))
+
+% deletes the specified content
+data(bad,:) = [];
+
+% 2.
+
+%% Visualises specified data content with box plot diagram; comma-separated name value pair 'symbol' and 'ro' indicates 
+%% plotstyle is compact which plots each outlier using an 'o' symbol in the same color as the corresponding box
+boxplot(data{:,'smoothness_mean'}, 'symbol', 'ro')
+
+% an empty array gets assigned with 159 rows getting its feature data deleted 
+data(159,:) = [];
+
+% 3.
+
+% rounded value is computed from multiplying 0.25 by the size of data's column "1" 
+nTest = round(0.25 * size(data,1))
+
+% comment removed:
+rng(1);
+
+% splitting data separately for testing and training dataset
+data_shuffled = data(randperm(size(data,1)), :);
+data_test = data_shuffled(1:1:nTest, :);
+size(data_test)
+data_train = data_shuffled(nTest+1:1:end, :);
+size(data_train)
+
+% designating data into named "test_labels" & "test_examples"
+test_labels = categorical(data_test{:,'diagnosis'});
+test_examples = data_test;
+test_examples(:,'diagnosis') = [];
+
+% assigning, naming "train_labels" and "train_examples"
+train_labels = categorical(data_train{:,'diagnosis'});
+train_examples = data_train;
+train_examples(:,'diagnosis') = [];
