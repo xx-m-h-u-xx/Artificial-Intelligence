@@ -1,0 +1,52 @@
+%%==================================================================================================================================================
+%% Performance Evaluation Holdout 
+%% Code is implemented in Matlab to split the data using a simple "holdout" approach to predict "diagnosis" feature from 'bloods_clean.csv' file
+%% 20% of the data reserved for testing and the other 80% used for training.
+%% Splitting the data up into an appropriately sized training dataset and testing dataset
+%% Appropriate calls to train and test the classifier
+%% Generating a confusion matrix, and using it to calculate an overall classification accuracy (diag c)
+%%===================================================================================================================================================
+
+
+
+% creating testing dataset of 20% holdout data
+nTest = round(0.20 * size(data,1))
+
+rng(1)
+data_shuffled = data(randperm(size(data,1)), :) ;
+
+% shuffling data for first 20% specified elements to be used for the testing dataset
+data_test = data_shuffled(1:1:nTest, :);
+size(data_test)
+
+% shuffling the remaining other percentage of data to be used for the training dataset
+data_train = data_shuffled(nTest+1:1:end, :);
+size(data_train)
+ 
+% all row Values in the data_test table under "diagnosis" gets 
+% converted to a categorical array datatype for the testing class labels
+test_labels = categorical(data_test{:,'diagnosis'});
+test_examples = data_test;
+test_examples(:,'diagnosis') = [];
+
+% all row Values in the "data_train" table under "diagnosis" gets 
+% converted to a categorical array datatype for the training class labels
+train_labels = categorical(data_train{:, 'diagnosis'});
+train_examples = data_train;
+train_examples(:, 'diagnosis') = [];
+
+% training a k-NN classifier from which it takes a copy of all the training
+% examples & labels, and makes a model to store all the information about the classifier 
+% the arguments are copied into two set field of the m model structure
+m = fitcknn(train_examples, train_labels)
+
+% classifying the data by comparing with the actual test examples
+predictions = predict(m, test_examples);
+
+% outputs a confusion matrix
+% displays performance of a classification model (or "classifier") 
+% on a set of test data: "test_labels"
+[c, order] = confusionmat(test_labels, predictions)
+
+% computes overall classification accuracy
+p = sum(diag(c)) / sum(c(1:1:end))
