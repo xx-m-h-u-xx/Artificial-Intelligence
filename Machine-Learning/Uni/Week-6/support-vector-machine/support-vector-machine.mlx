@@ -1,0 +1,54 @@
+%%=======================================================================
+%% Support Vector Machine - using a subset of "iris" data: sepal widths and sepal lengths for the versicolor and virginica classes are utilised
+%% without splitting whole dataset, code is implemented to train a standard Support Vector Machine (SVM) and visualise its linear decision boundary
+%% dataset has already been z-score standardised
+
+clear all;
+load("binary.mat","examples", labels")
+
+%% train an SVM on the whole dataset using default hyperparameters
+m = fitcsvm(examples, labels, 'KernelFunction', 'rbf', 'KernelScale', 10);
+
+
+%% to visualise the boundary, you need to build yourself a dense rectangular "grid" of testing data that covers the min/max extents of your training features… 
+%% generates a "grid" of testing data which spans the minimum and maximum value of each feature in the training dataset
+
+min_x = min(examples(:,1));
+max_x = max(examples(:,1));
+jump_x = (max_x - min_x) / 100;
+
+xs = [];
+ys = [];
+new_examples = [];
+
+% x axis
+for x = min_x:jump_x:max_x
+   
+    % y axis
+    for y = -2.5:0.05:2.5
+        
+        % takes record at the new coordinate, adds on at the end of array
+        % xs(end+1, 1) = x;
+        % ys(end+1, 2) = y;
+        
+        xs =[xs; x];
+        ys =[ys; y];
+        new_examples(end+1,:) = [x,y];
+    end
+end
+
+%% using trained SVM to classify the testing data that has been generated
+%% predict() to find the classifier’s prediction at every point in the grid
+predictions = predict(m, [xs ys] );
+
+%% generating a scatter plot of your testing data, with each point colour-coded by the associated classification result
+gscatter(xs, ys, predictions);
+
+%% superimposing the original training data so that the overlay is clearly visible
+hold on
+% gscatter(xs[1], ys[2]);
+
+% test
+% m = fitcsvm(examples, labels);
+% predictions = predict(m, examples);
+% predictions(1:1:10)   % 10 x 1 categporical array
