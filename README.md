@@ -1,3 +1,3 @@
 # Artificial-Intelligence
 
-University Year 3 Level 6 BSc (Hons) Computer Science unit
+University (Year 3 Level 6) Undergraduate Degree Course Unit in Artificial Intelligence
